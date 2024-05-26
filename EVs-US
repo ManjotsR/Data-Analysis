@@ -1,0 +1,59 @@
+ELECT *
+FROM EV
+-- DATA CLEANING
+
+--- Change Electric Vehicle Type
+
+UPDATE EV
+SET Electric_Vehicle_Type = CASE WHEN Electric_Vehicle_Type LIKE '%(PHEV)' THEN 'Hybrid'
+	WHEN Electric_Vehicle_Type LIKE '%(BEV)' THEN 'EV'
+	ELSE Electric_Vehicle_Type
+END
+FROM EV
+
+--- Drop VIN, County, Clean_Alternative_Fuel_Vehicle, Lesgislative District, Vehicle_Location, Electric Utility and 2020_Census_tract
+
+ALTER TABLE EV
+DROP COLUMN VIN, County, Postal_Code, Clean_Alternative_Fuel_Vehicle, Legislative_District, Vehicle_Location, Electric_Utility, [2020_Census_Tract]
+
+--- Getting rid of Null Values
+
+SELECT *
+FROM EV
+WHERE City IS NULL OR State IS NULL OR Model_Year IS NULL OR Make IS NULL OR Model 
+IS NULL OR Electric_Vehicle_Type IS NULL OR Electric_Range IS NULL OR Base_MSRP 
+IS NULL OR DOL_Vehicle_ID IS NULL
+
+DELETE 
+FROM EV
+WHERE CITY IS NULL
+
+-- Join it with another table that has information about pricing
+
+SELECT *
+FROM EVINFO
+
+DELETE
+FROM EVINFO
+WHERE Price IS NULL
+
+ALTER TABLE EVINFO
+DROP COLUMN Fast_charge
+
+-- Removing Duplicates
+
+WITH RowNumCTE AS(
+SELECT *, 
+	ROW_NUMBER() OVER(
+	PARTITION BY Model ORDER BY  Maker) row_num
+FROM EVINFO
+)
+DELETE 
+FROM RowNumCTE
+WHERE row_num > 1
+
+
+SELECT * 
+FROM EV
+JOIN EVINFO
+ON EV.Model = EVINFO.Model AND EV.Make = EVINFO.Maker
