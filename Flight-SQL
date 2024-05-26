@@ -1,0 +1,42 @@
+SELECT *
+FROM flights
+-- DATA CLEANING
+--- Getting rid of NULLS
+
+DELETE
+FROM flights
+WHERE id IS NULL OR year IS NULL OR month IS NULL OR day IS NULL OR dep_time IS NULL OR 
+sched_dep_time IS NULL OR dep_delay IS NULL OR arr_time IS NULL OR sched_arr_time IS NULL 
+OR arr_delay IS NULL OR carrier IS NULL OR flight IS NULL OR tailnum IS NULL OR origin
+IS NULL OR dest IS NULL OR air_time IS NULL OR distance IS NULL OR hour IS NULL OR minute
+IS NULL OR time_hour IS NULL OR name IS NULL
+
+--- Get rid of some columns
+
+ALTER TABLE flights
+DROP COLUMN tailnum
+
+--- Change the name os some airliners
+
+UPDATE flights
+SET name = CASE WHEN name ='JetBlue Airways' THEN 'JetBlue'
+	WHEN name = 'SkyWest Airlines Inc.' THEN 'SkyWest'
+	WHEN name = 'Southwest Airlines Co.' THEN 'Southwest'
+	WHEN name = 'United Air Lines Inc.' THEN 'United'
+	WHEN name = 'Alaska Airlines Inc.' THEN 'Alaska'
+	WHEN name = 'Hawaiian Airlines Inc.' THEN 'Hawaiian'
+	WHEN name = 'Frontier Airlines Inc.' THEN 'Frontier'
+	WHEN name = 'US Airways Inc.' THEN 'US'
+	WHEN name = 'Delta Air Lines Inc.' THEN 'Delta'
+	WHEN name = 'Endeavor Air Inc.' THEN 'Endeavor'
+	WHEN name = 'American Airlines Inc.' THEN 'American'
+	WHEN name = 'AirTran Airways Corporation' THEN 'AirTran'
+	WHEN name = 'ExpressJet Airlines Inc.' THEN 'ExpressJet'
+	WHEN name = 'Mesa Airlines Inc.' THEN 'Mesa'
+	ELSE name
+END
+FROM flights
+
+SELECT FORMAT(dep_time, '0000') AS dep_time, FORMAT(sched_dep_time, '0000') AS sched_dep_time, 
+FORMAT(arr_time, '0000') AS arr_time, FORMAT(sched_arr_time, '0000') AS ached_arr_time
+FROM flights
